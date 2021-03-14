@@ -109,6 +109,7 @@ def divisionBinaria(dividendo:list, divisor:list):
                 dividendo.pop(0)
                 if (len(dividendoActual) < len(divisor)):
                     cociente.append(0)
+                    residuo.append(0)
             else:
                 break
 
@@ -136,13 +137,14 @@ def calcularCRC (mensajeD: list, generadorG: list)-> list:
     r = len(generadorG)-1 # calcula el r
     tramaDividendo = mensajeD.copy() # el dividendo a agregarle los bits de r
 
-    for i in range(r):
+    for _ in range(r):
         tramaDividendo.append(0)
 
     result = divisionBinaria(tramaDividendo, generadorG)
     crc = result.get("Residuo")
-    crc.pop(0)
-    # print(result)
+    while (len(crc)>r):
+        crc.pop(0)
+    print(result)
     return crc
 
 def verificarReceptor(tramaX: list, generadorG: list):

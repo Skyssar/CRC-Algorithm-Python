@@ -1,33 +1,44 @@
+# Algoritmo integrado con la interfaz
+
 import tkinter as tk
 from tkinter import messagebox
 
 window = tk.Tk()
-window.title("Algoritmo CRC")
-window.geometry("530x300")
+window.title("Cyclic Redundance Check (CRC) Algorithm Simulation")
+window.geometry("510x600")
 window['bg'] = '#083E8E'
 
+lblTitle = tk.Label(window, text="Cyclic Redundance Check (CRC) Simulation", bg='#083E8E', fg="white")
+lblTitle.config(font=("Arial", 12, "bold"))
+lblTitle.place(x=50, y=10)
+
+text1= tk.StringVar()
+infoText1 = tk.Message(window, textvariable=text1, width="300px", bg='#083E8E', fg="white")
+infoText1.place(x=50, y=40)
+text1.set("The Cyclic Redundance Check (CRC) is an error-detecting code commonly used in digital networks and storage devices to detect accidental changes to raw data. You can try a test of how the algorithm would work in the form below. \nConsult the help for more information.")
+
 lblMensaje = tk.Label(window, text="Mensaje D", bg='#083E8E', fg="white")
-lblMensaje.place(x=50, y=20)
+lblMensaje.place(x=50, y=140)
 entryMensaje = tk.Entry(window, width=25)
-entryMensaje.place(x=50, y=40)
+entryMensaje.place(x=50, y=160)
 entryMensaje.focus()
 
 lblGenerador = tk.Label(window, text="Generador G", bg='#083E8E', fg="white")
-lblGenerador.place(x=50, y=80)
+lblGenerador.place(x=50, y=200)
 entryGenerador = tk.Entry(window, width=25)
-entryGenerador.place(x=50, y=100)
+entryGenerador.place(x=50, y=220)
 
 lblCRC = tk.Label(window, text="CRC", bg='#083E8E', fg="white")
-lblCRC.place(x=300, y=20)
+lblCRC.place(x=300, y=140)
 edtbTextCRC = tk.StringVar() # El texto editable
 txtCRC = tk.Entry(window, width=25, state="readonly", textvariable=edtbTextCRC)
-txtCRC.place(x=300, y=40)
+txtCRC.place(x=300, y=160)
 
 lblTramaX = tk.Label(window, text="Trama TX", bg='#083E8E', fg="white")
-lblTramaX.place(x=300, y=80)
+lblTramaX.place(x=300, y=200)
 edtbTextTramaX = tk.StringVar() # El texto editable
 txtTextTramaX = tk.Entry(window, width=25, textvariable=edtbTextTramaX)
-txtTextTramaX.place(x=300, y=100)
+txtTextTramaX.place(x=300, y=220)
 
 def switchButtonState():
     btnEnviarMensaje['state'] = tk.NORMAL
@@ -39,7 +50,7 @@ def validar(valor1: str, valor2: str):
         if convertToList(valor1) != 0 and convertToList(valor2) != 0:
             valido = True
         else:
-            messagebox.showerror("Syntax Error", "No se aceptan valores no binarios (0,1)")
+            messagebox.showerror("Syntax Error", "Non-binaries values are not accepted. Only (0,1)")
     else:
         messagebox.showerror("Syntax Error", "Message/Generator can not be empty")
     
@@ -70,9 +81,9 @@ def windowEnviarMensaje():
         infoReceptor = receptor(mensajeX, generadorStr)
 
         if (infoReceptor["Info"] == False):
-            messagebox.showerror("Receptor", "El mensaje no se envió correctamente \n" + "Sended Message: "+ mensajeX )
+            messagebox.showerror("Receptor", "The message was not sent correctly  \n" + "Sended Message: "+ mensajeX )
         else:
-            messagebox.showinfo("Receptor", "El mensaje fue enviado correctamente \nSended Message: " + infoReceptor["Sended Message"])
+            messagebox.showinfo("Receptor", "The message was sent correctly \nSended Message: " + infoReceptor["Sended Message"])
 
 def emisor(mensajeStr: str, generadorStr: str):
 
@@ -159,6 +170,7 @@ def divisionBinaria(dividendo:list, divisor:list):
                 dividendo.pop(0)
                 if (len(dividendoActual) < len(divisor)):
                     cociente.append(0)
+                    residuo.append(0)
             else:
                 break
 
@@ -191,7 +203,8 @@ def calcularCRC (mensajeD: list, generadorG: list)-> list:
 
     result = divisionBinaria(tramaDividendo, generadorG)
     crc = result.get("Residuo")
-    crc.pop(0)
+    while (len(crc)>r):
+        crc.pop(0)
     # print(result)
     return crc
 
@@ -214,10 +227,21 @@ def verificarReceptor(tramaX: list, generadorG: list):
 
     return salida
 
-btnCalcularCRC = tk.Button(window, text="Calcular CRC", command=windowCalcularCRC)
-btnCalcularCRC.place(x=50, y=140)
+btnCalcularCRC = tk.Button(window, text="Calculate CRC", command=windowCalcularCRC)
+btnCalcularCRC.place(x=50, y=260)
 
-btnEnviarMensaje = tk.Button(window, text="Enviar mensaje", state="disabled", command=windowEnviarMensaje)
-btnEnviarMensaje.place(x=300, y=140)
+btnEnviarMensaje = tk.Button(window, text="Send Message", state="disabled", command=windowEnviarMensaje)
+btnEnviarMensaje.place(x=300, y=260)
+
+def windowMoreInfo():
+    messagebox.showinfo("Instructions",  "1. Input a binarie value (0,1) in Message D \n"
+    + "2. Input a binarie value (0,1) in Generator G \n"
+    + "3. Click on Calculate CRC \n"
+    + "4. You can modifie the TX to check if the algortithm detects any error in sending \n"
+    + "5. Click on Send Message. \n"
+    + "6. The program will tell you if any error has been detected with the message or not")
+
+btnInfo = tk.Button(window, text="Help", relief="flat", command=windowMoreInfo)
+btnInfo.place(x=400, y=340)
 
 window.mainloop()
