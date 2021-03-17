@@ -109,7 +109,7 @@ def divisionBinaria(dividendo:list, divisor:list):
                 dividendo.pop(0)
                 if (len(dividendoActual) < len(divisor)):
                     cociente.append(0)
-                    residuo.append(0)
+                    residuo.append(dividendoActual[-1])
             else:
                 break
 
