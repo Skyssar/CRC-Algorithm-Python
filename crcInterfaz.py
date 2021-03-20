@@ -1,4 +1,5 @@
-# Algoritmo integrado con la interfaz by Skyssar
+# Algoritmo integrado con la interfaz by Skyssar 
+# Github Repo: https://github.com/Skyssar/CRC-Algorithm-Python
 
 import tkinter as tk
 from tkinter import messagebox
@@ -18,13 +19,13 @@ infoText1 = tk.Message(window, textvariable=text1, width="300px", bg='#083E8E', 
 infoText1.place(x=50, y=50)
 text1.set("The Cyclic Redundance Check (CRC) is an error-detecting code commonly used in digital networks and storage devices to detect accidental changes to raw data. You can try a test of how the algorithm would work in the form below. \nConsult the help for more information.")
 
-lblMensaje = tk.Label(window, text="Mensaje D", bg='#083E8E', fg="white")
+lblMensaje = tk.Label(window, text="Message D", bg='#083E8E', fg="white")
 lblMensaje.place(x=50, y=150)
 entryMensaje = tk.Entry(window, width=25)
 entryMensaje.place(x=50, y=170)
 entryMensaje.focus()
 
-lblGenerador = tk.Label(window, text="Generador G", bg='#083E8E', fg="white")
+lblGenerador = tk.Label(window, text="Generator G", bg='#083E8E', fg="white")
 lblGenerador.place(x=50, y=210)
 entryGenerador = tk.Entry(window, width=25)
 entryGenerador.place(x=50, y=230)
@@ -35,15 +36,16 @@ edtbTextCRC = tk.StringVar() # El texto editable
 txtCRC = tk.Entry(window, width=25, state="readonly", textvariable=edtbTextCRC)
 txtCRC.place(x=300, y=170)
 
-lblTramaX = tk.Label(window, text="Trama TX", bg='#083E8E', fg="white")
+lblTramaX = tk.Label(window, text="TX frame", bg='#083E8E', fg="white")
 lblTramaX.place(x=300, y=210)
 edtbTextTramaX = tk.StringVar() # El texto editable
 txtTextTramaX = tk.Entry(window, width=25, textvariable=edtbTextTramaX)
 txtTextTramaX.place(x=300, y=230)
 
-def switchButtonState():
+def switchButtonState(): # Cambia el estado del botón de disabled a normal
     btnEnviarMensaje['state'] = tk.NORMAL
 
+# (GUI) Valida que los valores no estén vacíos o no sean binarios
 def validar(valor1: str, valor2: str):
     valido = False
 
@@ -57,6 +59,7 @@ def validar(valor1: str, valor2: str):
     
     return valido
 
+# (GUI) Método para el botón calcularCRC
 def windowCalcularCRC():
     mensajeStr = entryMensaje.get()
     generadorStr = entryGenerador.get()
@@ -79,6 +82,7 @@ def windowCalcularCRC():
 
         switchButtonState()
 
+# (GUI) Método para el envío del mensaje 
 def windowEnviarMensaje():
     mensajeX = txtTextTramaX.get()
     generadorStr = entryGenerador.get()
@@ -93,6 +97,7 @@ def windowEnviarMensaje():
         else:
             messagebox.showinfo("Receptor", "The message was sent correctly \n \nSended Message: " + infoReceptor["Sended Message"])
 
+# Método que devuelve los cálculos del emisor (División, CRC, Trama TX)
 def emisor(mensajeStr: str, generadorStr: str):
 
     # Convertimos los mensajes de string a listas de integers
@@ -113,14 +118,28 @@ def emisor(mensajeStr: str, generadorStr: str):
     
     return result
 
+# Método que devuelve los cálculos del receptor (Verifica si el mensaje no sufrió cambios en la data)
 def receptor(tramaXStr:str, generadorStr: str):
     # Convertimos los mensajes de string a listas de integers
     tramaX = convertToList(tramaXStr)
     generadorG = convertToList(generadorStr)
 
-    result = verificarReceptor(tramaX, generadorG)
-    return result
+    tramaY = tramaX.copy()
+    result = divisionBinaria(tramaY, generadorG)
+    verResiduo = result["Residuo"]  # Capturamos el residuo de la división
+    verResiduo = depurarBinario(verResiduo)
+    salida = {}
 
+    if (len(verResiduo)>0):
+        salida.update({ "Info" : False })
+
+    else:
+        salida.update({ "Info" : True })
+    
+    salida.update({ "Sended Message" : convertToStr(tramaX) })
+    salida.update({ "Residuo" : convertToStr(verResiduo) })
+
+    return salida
 
 # Convierte el string del input en una lista de integers
 def convertToList(text: str)->list:
@@ -139,8 +158,9 @@ def convertToList(text: str)->list:
             break
 
     if binario: return binarioList
-    else: return 0
+    else: return 0 # Cualquier caso que no sea un número binario retornará 0
 
+# Convierte una lista a String nuevamente
 def convertToStr(binario: list)->str:
     
     for i in range(len(binario)):
@@ -218,40 +238,34 @@ def calcularCRC (mensajeD: list, generadorG: list)-> list:
     
     return result
 
-def verificarReceptor(tramaX: list, generadorG: list):
-    
-    tramaY = tramaX.copy()
-    result = divisionBinaria(tramaY, generadorG)
-    verResiduo = result["Residuo"]
-    verResiduo = depurarBinario(verResiduo)
-    salida = {}
-
-    if (len(verResiduo)>0):
-        salida.update({ "Info" : False })
-
-    else:
-        salida.update({ "Info" : True })
-    
-    salida.update({ "Sended Message" : convertToStr(tramaX) })
-    salida.update({ "Residuo" : convertToStr(verResiduo) })
-
-    return salida
-
+# GUI
 btnCalcularCRC = tk.Button(window, text="Calculate CRC", command=windowCalcularCRC)
 btnCalcularCRC.place(x=50, y=270)
 
 btnEnviarMensaje = tk.Button(window, text="Send Message", state="disabled", command=windowEnviarMensaje)
 btnEnviarMensaje.place(x=300, y=270)
 
+# La ayuda
 def windowMoreInfo():
-    messagebox.showinfo("Instructions",  "1. Input a binarie value (0,1) in Message D \n"
-    + "2. Input a binarie value (0,1) in Generator G \n"
-    + "3. Click on Calculate CRC \n"
-    + "4. You can modifie the TX to check if the algortithm detects any error in sending \n"
-    + "5. Click on Send Message. \n"
-    + "6. The program will tell you if any error has been detected with the message or not")
+    messagebox.showinfo("Instructions",  "1) Input a binarie value (0,1) in Message D \n"
+    + "2) Input a binarie value (0,1) in Generator G \n"
+    + "3) Click on Calculate CRC \n"
+    + "4) The program will return the results of the operation \n"
+    + "5) You can modifie the TX frame to check if the algortithm detects any error in sending \n"
+    + "6) Click on Send Message. \n"
+    + "7) The program will tell you if any error has been detected with the message or not")
+
+# def windowAbout():
+#     messagebox.showinfo("About Developing", "DEVELOPERS\n"
+#     + "Yasar José Cure G.\n"
+#     + "Marco Aguirre Viloria"
+#     + "\n\n GITHUB REPOSITORY \n"
+#     + "https://github.com/Skyssar/CRC-Algorithm-Python")
 
 btnInfo = tk.Button(window, text="Help", relief="flat", command=windowMoreInfo)
 btnInfo.place(x=420, y=340)
+
+# btnAbout = tk.Button(window, text="About", command=windowAbout)
+# btnAbout.place(x=370, y=340)
 
 window.mainloop()

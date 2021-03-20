@@ -1,7 +1,5 @@
 # CRC-Algorithm-Python
-Algorithm that allows to simulate the CRC (Cyclic Redundance Check) calculation in local networks.
-Algoritmo que permite simular el cálculo del CRC (Chequeo de Redundancia Cíclica) en redes locales.
-
+## Algoritmo que permite simular el cálculo del CRC (Chequeo de Redundancia Cíclica) en redes locales.
 El presente código corresponde a una simulación del cálculo del Chequeo de Redundancia Cíclica, un código de detección de errores usado frecuentemente en redes digitales y en dispositivos de almacenamiento para detectar cambios accidentales en los datos. Fue realizado en el lenguaje Python y su biblioteca gráfica para interfaces de usuario, Tkinter.
 
 El código CRC opera de la siguiente forma: 
@@ -13,8 +11,9 @@ Fuente :Kurose, J., & Ross, K. W. (2010). Redes de computadoras (Vol. 5).
 
 Así, el presente algoritmo permite realizar una simulación del funcionamiento del código CRC, en el cual el usuario podrá ingresar los valores binarios correspondientes al Mensaje D y el Generador G, devolviéndole el programa los patrones de bits correspondientes al CRC y a la trama G+r que se enviará al receptor. El usuario podrá también modificar dicha trama emulando errores en el mensaje transmitido que el programa se encargará de identificar.
 
-========================================================================
+==========================================================================
 
+## Algorithm that allows to simulate the CRC (Cyclic Redundance Check) calculation in local networks.
 The present code corresponds to a Cyclic Redundance Check calculate simulation, an error-detecting code frequently used in digital networks and storage devices to detect accidental changes in the raw data. 
 It was performed in Python Language and its GUI Tkinter. 
 
