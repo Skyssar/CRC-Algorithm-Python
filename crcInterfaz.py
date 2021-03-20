@@ -1,44 +1,45 @@
-# Algoritmo integrado con la interfaz
+# Algoritmo integrado con la interfaz by Skyssar
 
 import tkinter as tk
 from tkinter import messagebox
 
 window = tk.Tk()
 window.title("Cyclic Redundance Check (CRC) Algorithm Simulation")
-window.geometry("510x600")
+window.geometry("510x400")
+window.resizable(False, True)
 window['bg'] = '#083E8E'
 
 lblTitle = tk.Label(window, text="Cyclic Redundance Check (CRC) Simulation", bg='#083E8E', fg="white")
 lblTitle.config(font=("Arial", 12, "bold"))
-lblTitle.place(x=50, y=10)
+lblTitle.place(x=80, y=20)
 
 text1= tk.StringVar()
 infoText1 = tk.Message(window, textvariable=text1, width="300px", bg='#083E8E', fg="white")
-infoText1.place(x=50, y=40)
+infoText1.place(x=50, y=50)
 text1.set("The Cyclic Redundance Check (CRC) is an error-detecting code commonly used in digital networks and storage devices to detect accidental changes to raw data. You can try a test of how the algorithm would work in the form below. \nConsult the help for more information.")
 
 lblMensaje = tk.Label(window, text="Mensaje D", bg='#083E8E', fg="white")
-lblMensaje.place(x=50, y=140)
+lblMensaje.place(x=50, y=150)
 entryMensaje = tk.Entry(window, width=25)
-entryMensaje.place(x=50, y=160)
+entryMensaje.place(x=50, y=170)
 entryMensaje.focus()
 
 lblGenerador = tk.Label(window, text="Generador G", bg='#083E8E', fg="white")
-lblGenerador.place(x=50, y=200)
+lblGenerador.place(x=50, y=210)
 entryGenerador = tk.Entry(window, width=25)
-entryGenerador.place(x=50, y=220)
+entryGenerador.place(x=50, y=230)
 
 lblCRC = tk.Label(window, text="CRC", bg='#083E8E', fg="white")
-lblCRC.place(x=300, y=140)
+lblCRC.place(x=300, y=150)
 edtbTextCRC = tk.StringVar() # El texto editable
 txtCRC = tk.Entry(window, width=25, state="readonly", textvariable=edtbTextCRC)
-txtCRC.place(x=300, y=160)
+txtCRC.place(x=300, y=170)
 
 lblTramaX = tk.Label(window, text="Trama TX", bg='#083E8E', fg="white")
-lblTramaX.place(x=300, y=200)
+lblTramaX.place(x=300, y=210)
 edtbTextTramaX = tk.StringVar() # El texto editable
 txtTextTramaX = tk.Entry(window, width=25, textvariable=edtbTextTramaX)
-txtTextTramaX.place(x=300, y=220)
+txtTextTramaX.place(x=300, y=230)
 
 def switchButtonState():
     btnEnviarMensaje['state'] = tk.NORMAL
@@ -62,12 +63,19 @@ def windowCalcularCRC():
 
     valido = validar(mensajeStr, generadorStr)
     if valido:
-        infoEmisor = emisor(mensajeStr, generadorStr)
+        infoEmisor = emisor(mensajeStr, generadorStr) # Dict con cociente, residuo, crc y trama x
 
         CRC = infoEmisor["CRC"]
         tramaX = infoEmisor["Trama X"]
         edtbTextCRC.set(CRC)
         edtbTextTramaX.set(tramaX)
+
+        messagebox.showinfo("Operation completed!", "Details \n" 
+        +"\nQuo: "+ infoEmisor["Cociente"] 
+        + "\nRem: " + infoEmisor["Residuo"] 
+        # + "\nR: " + str(len(CRC))
+        + "\nCRC: " + CRC
+        + "\nTX: "+ tramaX)
 
         switchButtonState()
 
@@ -81,9 +89,9 @@ def windowEnviarMensaje():
         infoReceptor = receptor(mensajeX, generadorStr)
 
         if (infoReceptor["Info"] == False):
-            messagebox.showerror("Receptor", "The message was not sent correctly  \n" + "Sended Message: "+ mensajeX )
+            messagebox.showerror("Receptor", "The message was not sent correctly \n \n" + "Sended Message: "+ mensajeX )
         else:
-            messagebox.showinfo("Receptor", "The message was sent correctly \nSended Message: " + infoReceptor["Sended Message"])
+            messagebox.showinfo("Receptor", "The message was sent correctly \n \nSended Message: " + infoReceptor["Sended Message"])
 
 def emisor(mensajeStr: str, generadorStr: str):
 
@@ -91,19 +99,19 @@ def emisor(mensajeStr: str, generadorStr: str):
     mensajeD = convertToList(mensajeStr)
     generadorG = convertToList(generadorStr)
 
-    crc = calcularCRC(mensajeD, generadorG)
+    result = calcularCRC(mensajeD, generadorG)
+    crc = result["CRC"]
+
     tramaX = mensajeD.copy()    # La trama X a enviar al receptor 
     for x in crc:
         tramaX.append(x)
 
-    salida = {}
-    salida.update( {"CRC" : crc} )
-    salida.update( {"Trama X" : tramaX} )
+    result.update( {"Trama X" : tramaX} )
 
-    for clave, valor in salida.items():
-        salida[clave] = convertToStr(valor)
+    for clave, valor in result.items():
+        result[clave] = convertToStr(valor)
     
-    return salida
+    return result
 
 def receptor(tramaXStr:str, generadorStr: str):
     # Convertimos los mensajes de string a listas de integers
@@ -202,11 +210,13 @@ def calcularCRC (mensajeD: list, generadorG: list)-> list:
         tramaDividendo.append(0)
 
     result = divisionBinaria(tramaDividendo, generadorG)
-    crc = result.get("Residuo")
+    crc = (result.get("Residuo")).copy()
     while (len(crc)>r):
         crc.pop(0)
     # print(result)
-    return crc
+    result.update({"CRC" : crc})
+    
+    return result
 
 def verificarReceptor(tramaX: list, generadorG: list):
     
@@ -228,10 +238,10 @@ def verificarReceptor(tramaX: list, generadorG: list):
     return salida
 
 btnCalcularCRC = tk.Button(window, text="Calculate CRC", command=windowCalcularCRC)
-btnCalcularCRC.place(x=50, y=260)
+btnCalcularCRC.place(x=50, y=270)
 
 btnEnviarMensaje = tk.Button(window, text="Send Message", state="disabled", command=windowEnviarMensaje)
-btnEnviarMensaje.place(x=300, y=260)
+btnEnviarMensaje.place(x=300, y=270)
 
 def windowMoreInfo():
     messagebox.showinfo("Instructions",  "1. Input a binarie value (0,1) in Message D \n"
@@ -242,6 +252,6 @@ def windowMoreInfo():
     + "6. The program will tell you if any error has been detected with the message or not")
 
 btnInfo = tk.Button(window, text="Help", relief="flat", command=windowMoreInfo)
-btnInfo.place(x=400, y=340)
+btnInfo.place(x=420, y=340)
 
 window.mainloop()
