@@ -11,6 +11,8 @@ Fuente :Kurose, J., & Ross, K. W. (2010). Redes de computadoras (Vol. 5).
 
 Así, el presente algoritmo permite realizar una simulación del funcionamiento del código CRC, en el cual el usuario podrá ingresar los valores binarios correspondientes al Mensaje D y el Generador G, devolviéndole el programa los patrones de bits correspondientes al CRC y a la trama G+r que se enviará al receptor. El usuario podrá también modificar dicha trama emulando errores en el mensaje transmitido que el programa se encargará de identificar.
 
+El código está dividido en un archivo denominado crcAlgorithm.py que posee el funcionamiento lógico del algoritmo, y un archivo llamado crcInterfaz, que posee la versión de usuario del código, dotado de una interfaz gráfica en la que se puede interactuar.
+
 ==========================================================================
 
 ## Algorithm that allows to simulate the CRC (Cyclic Redundance Check) calculation in local networks.
